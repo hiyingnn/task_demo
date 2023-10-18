@@ -1,0 +1,21 @@
+version: '3'
+
+tasks:
+  import-mapping:
+    desc: Import mapping.
+    cmds:
+      - echo $CONNECTION_URI
+      - echo $TEST
+      - echo "Importing into profile:" $PROFILE
+      - mongoimport -c=people -d=ces_project --mode=upsert --file=test.csv --type csv --headerline $CONNECTION_URI
+    env:
+      profile: '{{default "local" .PROFILE}}'
+    dotenv: ['{{.PROFILE}}/.env.']  
+
+  import-explicit:
+    sources:
+      - "*.csv"
+    cmds:
+      - for: sources
+        cmd:
+        -  mongoimport -c=people -d=ces_project --mode=upsert --file={{.ITEM}} --type csv --headerline $CONNECTION_URI
